@@ -28,7 +28,7 @@ import { ethers }       from 'ethers';
 
 const GENLAYER_CONTRACT =
   process.env.GENLAYER_CONTRACT_ADDRESS ||
-  '0x30C0e23273881c0b1a144d66187cCB798c22D11A';
+  '0x3E42934cF056A3fA90e624aacb459C1D152DDf5A';
 
 const ARC_EXPLORER_URL = 'https://testnet.arcscan.app';
 
@@ -81,8 +81,17 @@ export async function POST(request) {
     return NextResponse.json({ decided: false });
   }
 
+  // Handle both string ('ACCEPTED', etc) and numeric (3, 5) status codes
+  const statusStr = receipt?.statusName || String(receipt?.status);
+  const isDecided = receipt && (
+    DECIDED_STATES.includes(receipt.status) || 
+    DECIDED_STATES.includes(statusStr) || 
+    ['FINALIZED', 'ACCEPTED', 'REVERTED'].includes(statusStr) ||
+    receipt.status === 5 || receipt.status === 3
+  );
+
   // Not decided yet — tell the client to keep polling
-  if (!receipt || !DECIDED_STATES.includes(receipt.status)) {
+  if (!isDecided) {
     log(`Not decided yet (status: ${receipt?.status ?? 'unknown'})`);
     return NextResponse.json({ decided: false });
   }

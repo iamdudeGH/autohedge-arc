@@ -29,7 +29,7 @@ async function deploy() {
   try {
     const txHash = await client.deployContract({
       code,
-      args: [70, 25, 200, ARC_CONTRACT], 
+      args: [70, 25, 200], 
     });
     
     console.log(`⏳ Deployment TX submitted: ${txHash}`);

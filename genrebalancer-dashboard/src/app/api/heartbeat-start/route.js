@@ -17,7 +17,7 @@ import { NextResponse } from 'next/server';
 
 const GENLAYER_CONTRACT =
   process.env.GENLAYER_CONTRACT_ADDRESS ||
-  '0x30C0e23273881c0b1a144d66187cCB798c22D11A';
+  '0x3E42934cF056A3fA90e624aacb459C1D152DDf5A';
 
 export async function POST(request) {
   let body;
@@ -50,8 +50,8 @@ export async function POST(request) {
   try {
     const glTxHash = await glWriteClient.writeContract({
       address:      GENLAYER_CONTRACT,
-      functionName: 'heartbeat',  // Uses the already-deployed method
-      args:         [],
+      functionName: 'heartbeat_for',
+      args:         [treasuryAddress],
     });
 
     console.log(`[heartbeat-start] Submitted: ${glTxHash}`);
