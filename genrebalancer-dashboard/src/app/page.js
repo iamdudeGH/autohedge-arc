@@ -93,9 +93,20 @@ export default function Home() {
     if (!contractAddr) return;
     try {
       const provider = new ethers.JsonRpcProvider('https://rpc.testnet.arc.network');
-      const contract = new ethers.Contract(contractAddr, DEMO_TREASURY_ABI, provider);
-      const [, , weth, usdc, rebalances] = await contract.getInfo();
-      setTreasuryInfo({ weth: weth.toString(), usdc: usdc.toString(), rebalances: Number(rebalances) });
+      
+      const ERC20_ABI = ['function balanceOf(address account) view returns (uint256)'];
+      const wethContract = new ethers.Contract('0xa48d06a3E9df191B84dbb4402c63E9E439e9e828', ERC20_ABI, provider);
+      const usdcContract = new ethers.Contract('0xe1283D7724C82593013a8CFd40141789E294874E', ERC20_ABI, provider);
+
+      const wethBal = await wethContract.balanceOf(contractAddr);
+      const usdcBal = await usdcContract.balanceOf(contractAddr);
+
+      // Rebalances count is removed from ui or just mocked to 0/history.length since the real contract doesn't store this state variable easily without parsing events.
+      setTreasuryInfo({ 
+        weth: wethBal.toString(), 
+        usdc: usdcBal.toString(), 
+        rebalances: "See History" 
+      });
     } catch (e) {
       console.warn('fetchTreasuryInfo failed:', e.message);
     }
