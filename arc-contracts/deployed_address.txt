@@ -1,0 +1,11 @@
+{
+  "network": "arc_testnet",
+  "deployer": "0x9e8be61Fc0405ab9144329dB09370ba3767c1BC6",
+  "treasury": "0xa0935944899826b4E32aCDBe2557fF6E0a9470c1",
+  "mockWETH": "0xa48d06a3E9df191B84dbb4402c63E9E439e9e828",
+  "mockUSDC": "0xe1283D7724C82593013a8CFd40141789E294874E",
+  "mockRouter": "0xc18f4EE8117FB2a2b9D670B6c80Bf6c2cEe1F69b",
+  "poolFee": 3000,
+  "slippageBps": 200,
+  "deployedAt": "2026-04-07T09:23:55.924Z"
+}

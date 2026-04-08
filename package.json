@@ -1,0 +1,13 @@
+{
+  "name": "autohedge-cron",
+  "version": "1.0.0",
+  "description": "AutoHedge autonomous heartbeat scheduler",
+  "main": "heartbeat-cron.js",
+  "scripts": {
+    "cron": "node heartbeat-cron.js",
+    "cron:pm2": "npx pm2 start heartbeat-cron.js --name autohedge-cron && npx pm2 save"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
