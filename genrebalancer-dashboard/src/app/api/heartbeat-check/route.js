@@ -28,7 +28,7 @@ import { ethers }       from 'ethers';
 
 const GENLAYER_CONTRACT =
   process.env.GENLAYER_CONTRACT_ADDRESS ||
-  '0x3E42934cF056A3fA90e624aacb459C1D152DDf5A';
+  '0x30C0e23273881c0b1a144d66187cCB798c22D11A';
 
 const ARC_EXPLORER_URL = 'https://testnet.arcscan.app';
 
@@ -86,8 +86,8 @@ export async function POST(request) {
   const isDecided = receipt && (
     DECIDED_STATES.includes(receipt.status) || 
     DECIDED_STATES.includes(statusStr) || 
-    ['FINALIZED', 'ACCEPTED', 'REVERTED'].includes(statusStr) ||
-    receipt.status === 5 || receipt.status === 3
+    ['FINALIZED', 'ACCEPTED', 'REVERTED', 'ERROR'].includes(statusStr) ||
+    receipt.status === 5 || receipt.status === 3 || receipt.status === 7
   );
 
   // Not decided yet — tell the client to keep polling
@@ -115,13 +115,33 @@ export async function POST(request) {
     log(`Could not read audit logs: ${e.message}`);
   }
 
-  const riskScore    = latestLog?.actual_risk ?? latestLog?.ai_decision?.risk_score ?? 0;
-  const marketSignal = latestLog?.ai_decision?.market_signal ?? 'SAFE';
-  const reasoning    = latestLog?.ai_decision?.reasoning ?? 'AI analysis complete.';
-  const speedLimit   = latestLog?.speed_limit_applied ?? 25;
+  let aiDecision = latestLog?.ai_decision || null;
 
-  const isTradeAuthorized = latestLog?.action === 'TRADE_AUTHORIZED';
-  const percentBps = isTradeAuthorized ? Math.round(speedLimit * 100) : 0;
+  // If the log was an "ERROR" log due to the emit() failure, the AI decision is actually
+  // trapped inside the `raw_output` field as a JSON string! Let's rescue it.
+  if (latestLog?.action === 'ERROR' && latestLog?.raw_output) {
+    try {
+      let clean = latestLog.raw_output.trim();
+      if (clean.startsWith('`')) clean = clean.split('\n').slice(1).join('\n');
+      if (clean.endsWith('`')) clean = clean.substring(0, clean.lastIndexOf('\n'));
+      const parsed = JSON.parse(clean.trim());
+      
+      if (Array.isArray(parsed)) aiDecision = parsed[0];
+      else if (parsed.validators) aiDecision = parsed.validators[0];
+      else if (parsed.validator_1) aiDecision = parsed.validator_1;
+      else aiDecision = parsed;
+    } catch (e) {
+      log(`Failed to rescue AI decision from raw_output: ${e.message}`);
+    }
+  }
+
+  const riskScore    = latestLog?.actual_risk ?? aiDecision?.risk_score ?? 0;
+  const marketSignal = aiDecision?.market_signal ?? 'SAFE';
+  const reasoning    = aiDecision?.reasoning ?? 'AI analysis complete.';
+  
+  // Calculate speed limit automatically based on the risk limit (0.7)
+  const isTradeAuthorized = riskScore > 0.7;
+  const percentBps = isTradeAuthorized ? 2500 : 0; // 2500 bps = 25%
 
   log(`AI decision: ${marketSignal} | risk: ${riskScore} | percentBps: ${percentBps}`);
 

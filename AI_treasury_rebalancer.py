@@ -27,6 +27,7 @@ class GenRebalancer(gl.Contract):
         self.risk_tolerance_pct = u256(risk_tolerance_pct)
         self.speed_limit = u256(speed_limit)
         self.protection_slippage = u256(protection_slippage)
+        self.audit_logs = DynArray[str]()
 
     @gl.public.view
     def get_constitution(self) -> str:

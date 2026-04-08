@@ -17,7 +17,7 @@ import { NextResponse } from 'next/server';
 
 const GENLAYER_CONTRACT =
   process.env.GENLAYER_CONTRACT_ADDRESS ||
-  '0x3E42934cF056A3fA90e624aacb459C1D152DDf5A';
+  '0x30C0e23273881c0b1a144d66187cCB798c22D11A';
 
 export async function POST(request) {
   let body;
@@ -45,13 +45,13 @@ export async function POST(request) {
   const glAccount     = createAccount(glBurnerKey);
   const glWriteClient = createClient({ chain: studionet, account: glAccount });
 
-  console.log(`[heartbeat-start] Submitting heartbeat_for(${treasuryAddress})`);
+  console.log(`[heartbeat-start] Submitting heartbeat() targeting ${treasuryAddress}`);
 
   try {
     const glTxHash = await glWriteClient.writeContract({
       address:      GENLAYER_CONTRACT,
-      functionName: 'heartbeat_for',
-      args:         [treasuryAddress],
+      functionName: 'heartbeat',
+      args:         [],
     });
 
     console.log(`[heartbeat-start] Submitted: ${glTxHash}`);
