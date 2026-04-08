@@ -102,9 +102,9 @@ export async function POST(request) {
   }
   log('INFO', `GenLayer tx: ${glTxHash}`);
 
-  // ── Step 3: Poll for consensus ─────────────────────────────────────────────
+  // ── Step 3: Poll for consensus (max 50s — stays under Vercel's 60s limit) ──
   log('INFO', 'Polling for consensus...');
-  for (let i = 0; i < 55; i++) {
+  for (let i = 0; i < 25; i++) {
     await sleep(2000);
     try {
       const receipt = await glWriteClient.getTransaction({ hash: glTxHash });

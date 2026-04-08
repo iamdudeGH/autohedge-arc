@@ -179,29 +179,74 @@ export default function Home() {
     if (!treasuryAddress) return;
     setIsRunning(true);
     setLastResult(null);
-    setHeartbeatStep('1/3 — Submitting to GenLayer AI consensus… (~20–60s)');
+    setHeartbeatStep('1/3 — Submitting to GenLayer AI consensus…');
 
     try {
-      const res  = await fetch('/api/heartbeat-for', {
+      // ── Step 1: Submit the GenLayer tx (fast, ~3s) ──────────────────────
+      const startRes = await fetch('/api/heartbeat-start', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ treasuryAddress, userWallet: walletAddress }),
       });
 
-      setHeartbeatStep('2/3 — Validators reached consensus. Relaying to Arc…');
-      const data = await res.json();
+      let startData;
+      try {
+        startData = await startRes.json();
+      } catch {
+        throw new Error(`Server error (HTTP ${startRes.status}). Check Vercel logs.`);
+      }
 
-      if (!data.success) throw new Error(data.error ?? 'Heartbeat failed');
+      if (!startData.success) throw new Error(startData.error ?? 'GenLayer submission failed');
 
+      const { glTxHash } = startData;
+      setHeartbeatStep(`2/3 — Waiting for AI validator consensus… (TX: ${glTxHash.slice(0, 10)}…)`);
+
+      // ── Step 2: Poll heartbeat-check every 3s until decided ──────────────
+      let result = null;
+      let attempts = 0;
+      const maxAttempts = 40; // 40 × 3s = 2 minute max wait
+
+      while (!result && attempts < maxAttempts) {
+        await new Promise(r => setTimeout(r, 3000));
+        attempts++;
+
+        const checkRes = await fetch('/api/heartbeat-check', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ glTxHash, treasuryAddress }),
+        });
+
+        let checkData;
+        try {
+          checkData = await checkRes.json();
+        } catch {
+          // Non-JSON response — skip this poll and try again
+          continue;
+        }
+
+        if (checkData.decided) {
+          result = checkData;
+          break;
+        }
+
+        // Still pending — update the step counter
+        setHeartbeatStep(`2/3 — AI validators reaching consensus… (${attempts * 3}s elapsed)`);
+      }
+
+      if (!result) throw new Error('Consensus timed out after 2 minutes. Please try again.');
+
+      // ── Step 3: Show result ──────────────────────────────────────────────
       setHeartbeatStep('3/3 — Arc transaction confirmed!');
-      setLastResult(data);
+      if (!result.success) throw new Error(result.error ?? 'Heartbeat failed');
+
+      setLastResult(result);
 
       // Refresh treasury balances
       await fetchTreasuryInfo(treasuryAddress);
 
       // Save to localStorage history
-      const entry = { ...data, timestamp: Date.now() };
-      const saved = JSON.parse(localStorage.getItem(`autohedge:history:${walletAddress}`) || '[]');
+      const entry   = { ...result, timestamp: Date.now() };
+      const saved   = JSON.parse(localStorage.getItem(`autohedge:history:${walletAddress}`) || '[]');
       const updated = [entry, ...saved].slice(0, 20);
       localStorage.setItem(`autohedge:history:${walletAddress}`, JSON.stringify(updated));
       setHistory(updated);
