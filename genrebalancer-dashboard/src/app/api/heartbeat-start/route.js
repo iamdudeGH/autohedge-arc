@@ -50,8 +50,8 @@ export async function POST(request) {
   try {
     const glTxHash = await glWriteClient.writeContract({
       address:      GENLAYER_CONTRACT,
-      functionName: 'heartbeat_for',
-      args:         [treasuryAddress],
+      functionName: 'heartbeat',  // Uses the already-deployed method
+      args:         [],
     });
 
     console.log(`[heartbeat-start] Submitted: ${glTxHash}`);

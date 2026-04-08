@@ -229,6 +229,11 @@ export default function Home() {
           break;
         }
 
+        // Surface server-side errors immediately instead of silently timing out
+        if (checkData.success === false && checkData.error) {
+          throw new Error(`Heartbeat check failed: ${checkData.error}`);
+        }
+
         // Still pending — update the step counter
         setHeartbeatStep(`2/3 — AI validators reaching consensus… (${attempts * 3}s elapsed)`);
       }
