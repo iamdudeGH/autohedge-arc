@@ -101,11 +101,11 @@ export default function Home() {
       const wethBal = await wethContract.balanceOf(contractAddr);
       const usdcBal = await usdcContract.balanceOf(contractAddr);
 
-      // Rebalances count is removed from ui or just mocked to 0/history.length since the real contract doesn't store this state variable easily without parsing events.
+      // Rebalances count is tracked via local history in the UI now since reading events off-chain repeatedly is slow.
       setTreasuryInfo({ 
         weth: wethBal.toString(), 
-        usdc: usdcBal.toString(), 
-        rebalances: "See History" 
+        usdc: usdcBal.toString(),
+        rebalancesCount: 0 // handled in JSX via history.length
       });
     } catch (e) {
       console.warn('fetchTreasuryInfo failed:', e.message);
@@ -477,7 +477,7 @@ export default function Home() {
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Heartbeats</div>
                 <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--accent)', fontFamily: 'monospace' }}>
-                  {treasuryInfo.rebalances}
+                  {history.length}
                 </div>
               </div>
             </div>
