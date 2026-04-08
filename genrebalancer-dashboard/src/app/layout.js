@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'AutoHedge x Arc',
+  title: 'GenRebalancer x Arc',
   description: 'Cross-chain AI treasury manager on GenLayer and Arc Networks',
 };
 
