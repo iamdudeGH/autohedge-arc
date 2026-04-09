@@ -87,11 +87,16 @@ export async function POST(request) {
     console.log(`[deploy-treasury] Deployed at: ${contractAddress}`);
 
     // 2. Fund the new treasury with 1,000 WETH mock tokens!
-    // Since deployer is the owner of MockWETH, deployer can mint.
     console.log(`[deploy-treasury] Funding treasury with Mock WETH...`);
     const wethContract = new ethers.Contract(MOCK_WETH, erc20Artifact.abi, deployer);
     const mintTx = await wethContract.mint(contractAddress, ethers.parseEther("1000"));
     await mintTx.wait();
+
+    // 2.5 Fund the Mock Router with 1,000,000 Mock USDC so swaps never fail with insufficient balance
+    console.log(`[deploy-treasury] Funding router with Mock USDC for liquidity...`);
+    const usdcContract = new ethers.Contract(MOCK_USDC, erc20Artifact.abi, deployer);
+    const routerMintTx = await usdcContract.mint(MOCK_ROUTER, ethers.parseUnits("1000000", 18));
+    await routerMintTx.wait();
 
     // 3. Transfer treasury ownership to the user
     console.log(`[deploy-treasury] Transferring ownership to the user...`);

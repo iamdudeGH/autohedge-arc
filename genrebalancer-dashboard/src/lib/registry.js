@@ -14,8 +14,19 @@
 import fs   from 'fs';
 import path from 'path';
 
-const KEY_PREFIX        = 'autohedge:treasury:v2:';
+const KEY_PREFIX        = 'autohedge:treasury:v3:';
 const LOCAL_FILE_PATH   = path.join(process.cwd(), '.local-registry.json');
+
+// ── Upstash Redis (production) ───────────────────────────────────────────────
+
+async function getRedis() {
+  // Lazy import so local builds without @upstash/redis still work
+  const { Redis } = await import('@upstash/redis');
+  return new Redis({
+    url:   process.env.KV_REST_API_URL,
+    token: process.env.KV_REST_API_TOKEN,
+  });
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -40,17 +51,6 @@ function writeLocal(data) {
   } catch (e) {
     console.error('[registry] Could not write local file:', e.message);
   }
-}
-
-// ── Upstash Redis (production) ───────────────────────────────────────────────
-
-async function getRedis() {
-  // Lazy import so local builds without @upstash/redis still work
-  const { Redis } = await import('@upstash/redis');
-  return new Redis({
-    url:   process.env.KV_REST_API_URL,
-    token: process.env.KV_REST_API_TOKEN,
-  });
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
