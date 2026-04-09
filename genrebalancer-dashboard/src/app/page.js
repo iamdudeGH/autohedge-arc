@@ -495,7 +495,7 @@ export default function Home() {
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
         <div className="glass-panel" style={{ flex: 1, minWidth: 240, padding: '0.75rem 1rem' }}>
           <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', display: 'block' }}>GenLayer Contract</span>
-          <a href={GENLAYER_STUDIO_URL} target="_blank" rel="noreferrer"
+          <a href={`${GENLAYER_STUDIO_URL}/contracts/${GENLAYER_CONTRACT_ADDRESS}`} target="_blank" rel="noreferrer"
             style={{ color: 'var(--accent)', textDecoration: 'none', fontFamily: 'monospace', fontSize: '0.82rem' }}>
             {GENLAYER_CONTRACT_ADDRESS.slice(0, 10)}…{GENLAYER_CONTRACT_ADDRESS.slice(-8)} ↗
           </a>
@@ -597,13 +597,22 @@ export default function Home() {
                 {isTradeExecuted && (
                   <span>Rebalanced <strong style={{ color: '#fca5a5' }}>{(lastResult.percentBps / 100).toFixed(0)}%</strong> of portfolio</span>
                 )}
-                <span>
-                  Arc tx:{' '}
-                  <a href={lastResult.explorerUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontFamily: 'monospace' }}>
-                    {lastResult.arcTxHash?.slice(0, 10)}…
-                  </a>
-                </span>
-                {lastResult.blockNumber && <span>Block {lastResult.blockNumber}</span>}
+                {lastResult.glTxHash && (
+                  <span>
+                    GenLayer tx:{' '}
+                    <a href={`${GENLAYER_STUDIO_URL}/transactions/${lastResult.glTxHash}`} target="_blank" rel="noreferrer" style={{ color: '#8b5cf6', textDecoration: 'none', fontFamily: 'monospace' }}>
+                      {lastResult.glTxHash?.slice(0, 10)}…
+                    </a>
+                  </span>
+                )}
+                {lastResult.arcTxHash && (
+                  <span>
+                    Arc tx:{' '}
+                    <a href={lastResult.explorerUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontFamily: 'monospace' }}>
+                      {lastResult.arcTxHash?.slice(0, 10)}…
+                    </a>
+                  </span>
+                )}
               </div>
             </>
           ) : (
@@ -634,12 +643,21 @@ export default function Home() {
                   <p style={{ margin: '0.5rem 0', fontSize: '0.9rem', color: 'var(--text-main)' }}>{h.reasoning}</p>
                   <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)', alignItems: 'center', flexWrap: 'wrap' }}>
                     <span>Risk: <strong style={{ color: 'var(--accent)' }}>{(h.riskScore ?? 0).toFixed(3)}</strong></span>
-                    {h.arcTxHash && (
-                      <a href={h.explorerUrl} target="_blank" rel="noreferrer"
-                        style={{ color: 'var(--accent)', textDecoration: 'none', marginLeft: 'auto' }}>
-                        View Arc tx ↗
-                      </a>
-                    )}
+                    
+                    <div style={{ marginLeft: 'auto', display: 'flex', gap: '1.5rem' }}>
+                      {h.glTxHash && (
+                        <a href={`${GENLAYER_STUDIO_URL}/transactions/${h.glTxHash}`} target="_blank" rel="noreferrer"
+                           style={{ color: '#8b5cf6', textDecoration: 'none' }}>
+                          View GenLayer tx ↗
+                        </a>
+                      )}
+                      {h.arcTxHash && (
+                        <a href={h.explorerUrl} target="_blank" rel="noreferrer"
+                           style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+                          View Arc tx ↗
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </li>
               );

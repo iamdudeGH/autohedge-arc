@@ -16,4 +16,4 @@ export const ARC_TESTNET = {
 };
 
 export const ARC_EXPLORER_URL = "https://testnet.arcscan.app";
-export const GENLAYER_STUDIO_URL = "https://studio.genlayer.com";
+export const GENLAYER_STUDIO_URL = "https://explorer-studio.genlayer.com";
