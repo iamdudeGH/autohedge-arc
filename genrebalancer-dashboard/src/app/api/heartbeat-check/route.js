@@ -153,18 +153,21 @@ export async function POST(request) {
   // ── Submit Arc tx to user's demo contract ──────────────────────────────────
   let arcTxHash, blockNumber;
   try {
-    const provider = new ethers.JsonRpcProvider(arcRpcUrl);
-    const wallet   = new ethers.Wallet(arcPrivateKey, provider);
-    const contract = new ethers.Contract(treasuryAddress, DEMO_TREASURY_ABI, wallet);
+    if (isTradeAuthorized) {
+      const provider = new ethers.JsonRpcProvider(arcRpcUrl);
+      const wallet   = new ethers.Wallet(arcPrivateKey, provider);
+      const contract = new ethers.Contract(treasuryAddress, DEMO_TREASURY_ABI, wallet);
 
-    const tx  = await contract.rebalance(percentBps, marketSignal);
-    arcTxHash = tx.hash;
-    log(`Arc tx submitted: ${arcTxHash}`);
+      const tx  = await contract.rebalance(percentBps, marketSignal);
+      arcTxHash = tx.hash;
+      log(`Arc tx submitted: ${arcTxHash}`);
 
-    const arcReceipt = await tx.wait(1);
-    blockNumber      = arcReceipt.blockNumber;
-    log(`Arc tx confirmed in block ${blockNumber}`);
-
+      const arcReceipt = await tx.wait(1);
+      blockNumber      = arcReceipt.blockNumber;
+      log(`Arc tx confirmed in block ${blockNumber}`);
+    } else {
+      log(`Risk is ${riskScore} (SAFE). Skipping Arc relay to avoid 0% swap revert.`);
+    }
   } catch (e) {
     log(`Arc relay failed: ${e.message}`);
     // Return AI result even if Arc failed
