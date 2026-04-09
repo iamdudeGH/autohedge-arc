@@ -291,7 +291,7 @@ export default function Home() {
         {/* Header */}
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           <div>
-            <h1 style={{ fontSize: '2rem', margin: 0, background: 'linear-gradient(90deg, #fff, #93c5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <h1 className="gradient-text" style={{ fontSize: '2.5rem', margin: 0 }}>
               GenRebalancer <span style={{ fontWeight: 300 }}>× Arc</span>
             </h1>
             <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0', fontSize: '0.85rem' }}>
@@ -359,7 +359,7 @@ export default function Home() {
     return (
       <main className="dashboard-container">
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <h1 style={{ fontSize: '1.8rem', margin: 0, background: 'linear-gradient(90deg, #fff, #93c5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <h1 className="gradient-text" style={{ fontSize: '1.8rem', margin: 0 }}>
             GenRebalancer × Arc
           </h1>
           <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -431,7 +431,7 @@ export default function Home() {
       {/* Header */}
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.08)', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.8rem', margin: 0, background: 'linear-gradient(90deg, #fff, #93c5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <h1 className="gradient-text" style={{ fontSize: '1.8rem', margin: 0 }}>
             GenRebalancer × Arc
           </h1>
           <p style={{ color: 'var(--text-muted)', margin: '0.2rem 0 0', fontSize: '0.8rem' }}>Cross-chain AI Treasury Manager</p>
