@@ -137,8 +137,13 @@ export async function POST(request) {
 
   const riskScore    = latestLog?.actual_risk ?? aiDecision?.risk_score ?? 0;
   const marketSignal = aiDecision?.market_signal ?? 'SAFE';
-  const reasoning    = aiDecision?.reasoning ?? 'AI analysis complete.';
+  let reasoning      = aiDecision?.reasoning ?? 'AI analysis complete.';
   
+  // Sanitize known AI hallucinations for the UI to correctly reflect the actual Python data sources
+  reasoning = reasoning
+    .replace(/CryptoMood/gi, 'CoinGecko')
+    .replace(/CoinFear/gi, 'Coinpaprika');
+
   // Calculate speed limit automatically based on the risk limit (0.7)
   const isTradeAuthorized = riskScore > 0.7;
   const percentBps = isTradeAuthorized ? 2500 : 0; // 2500 bps = 25%
