@@ -378,9 +378,16 @@ export default function Home() {
     return (
       <main className="dashboard-container">
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <h1 className="gradient-text" style={{ fontSize: '1.8rem', margin: 0 }}>
-            GenRebalancer × Arc
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              style={{ width: 48, height: 48, borderRadius: '12px', filter: 'drop-shadow(0 0 15px rgba(139, 92, 246, 0.4))', border: '1px solid rgba(255,255,255,0.1)' }} 
+            />
+            <h1 className="gradient-text" style={{ fontSize: '1.8rem', margin: 0 }}>
+              GenRebalancer × Arc
+            </h1>
+          </div>
           <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }} />
             <span style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: 'var(--text-muted)' }}>{walletShort}</span>
@@ -449,11 +456,18 @@ export default function Home() {
     <main className="dashboard-container">
       {/* Header */}
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.08)', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h1 className="gradient-text" style={{ fontSize: '1.8rem', margin: 0 }}>
-            GenRebalancer × Arc
-          </h1>
-          <p style={{ color: 'var(--text-muted)', margin: '0.2rem 0 0', fontSize: '0.8rem' }}>Cross-chain AI Treasury Manager</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <img 
+            src="/logo.png" 
+            alt="Logo" 
+            style={{ width: 48, height: 48, borderRadius: '12px', filter: 'drop-shadow(0 0 15px rgba(139, 92, 246, 0.4))', border: '1px solid rgba(255,255,255,0.1)' }} 
+          />
+          <div>
+            <h1 className="gradient-text" style={{ fontSize: '1.8rem', margin: 0 }}>
+              GenRebalancer × Arc
+            </h1>
+            <p style={{ color: 'var(--text-muted)', margin: '0.2rem 0 0', fontSize: '0.8rem' }}>Cross-chain AI Treasury Manager</p>
+          </div>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
