@@ -290,13 +290,20 @@ export default function Home() {
       <main className="dashboard-container">
         {/* Header */}
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <div>
-            <h1 className="gradient-text" style={{ fontSize: '2.5rem', margin: 0 }}>
-              GenRebalancer <span style={{ fontWeight: 300 }}>× Arc</span>
-            </h1>
-            <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0', fontSize: '0.85rem' }}>
-              Cross-chain AI Treasury Manager
-            </p>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              style={{ width: 48, height: 48, borderRadius: '12px', filter: 'drop-shadow(0 0 15px rgba(139, 92, 246, 0.4))', border: '1px solid rgba(255,255,255,0.1)' }} 
+            />
+            <div>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                GenRebalancer <span style={{ fontWeight: 300 }}>× Arc</span>
+              </h1>
+              <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0', fontSize: '0.85rem' }}>
+                Cross-chain AI Treasury Manager
+              </p>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
