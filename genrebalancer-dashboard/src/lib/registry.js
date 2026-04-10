@@ -14,7 +14,7 @@
 import fs   from 'fs';
 import path from 'path';
 
-const KEY_PREFIX        = 'autohedge:treasury:v3:';
+const KEY_PREFIX        = 'autohedge:treasury:v4:';
 const LOCAL_FILE_PATH   = path.join(process.cwd(), '.local-registry.json');
 
 // ── Upstash Redis (production) ───────────────────────────────────────────────
