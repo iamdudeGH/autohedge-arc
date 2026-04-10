@@ -33,7 +33,7 @@ const GENLAYER_CONTRACT =
 const ARC_EXPLORER_URL = 'https://testnet.arcscan.app';
 
 const DEMO_TREASURY_ABI = [
-  'function rebalance(uint256 percentBps, string signal) returns (bool)',
+  'function rebalance(uint256 percentBps, string signal, bytes signature) returns (bool)',
 ];
 
 function log(msg) {
@@ -158,9 +158,17 @@ export async function POST(request) {
       const wallet   = new ethers.Wallet(arcPrivateKey, provider);
       const contract = new ethers.Contract(treasuryAddress, DEMO_TREASURY_ABI, wallet);
 
-      const tx  = await contract.rebalance(percentBps, marketSignal);
+      // Cryptographically sign the GenLayer decision payload
+      const payloadHash = ethers.solidityPackedKeccak256(
+          ["uint256", "string"],
+          [percentBps, marketSignal]
+      );
+      const signature = await wallet.signMessage(ethers.getBytes(payloadHash));
+
+      // Append signature to Arc Execution
+      const tx  = await contract.rebalance(percentBps, marketSignal, signature);
       arcTxHash = tx.hash;
-      log(`Arc tx submitted: ${arcTxHash}`);
+      log(`Arc tx submitted with Oracle Signature: ${arcTxHash}`);
 
       const arcReceipt = await tx.wait(1);
       blockNumber      = arcReceipt.blockNumber;

@@ -39,6 +39,7 @@ contract TreasuryRebalancer {
     address public swapRouter;       // DEX router (Uniswap V3-compatible)
     address public tokenIn;          // Volatile token to sell  (e.g. WETH)
     address public tokenOut;         // Stable destination      (e.g. USDC)
+    address public aiOracle;         // Cryptographic signer validator
     uint24  public poolFee;          // Uniswap pool fee tier   (e.g. 3000 = 0.3 %)
     uint256 public slippageBps;      // Max acceptable slippage in basis points
 
@@ -75,20 +76,24 @@ contract TreasuryRebalancer {
      * @param _tokenOut    Safe-haven asset to receive        (e.g. USDC)
      * @param _poolFee     Uniswap V3 fee tier               (500 | 3000 | 10000)
      * @param _slippageBps Maximum slippage in basis points  (e.g. 200 = 2 %)
+     * @param _aiOracle    Trusted GenLayer oracle address for sig verification
      */
     constructor(
         address _swapRouter,
         address _tokenIn,
         address _tokenOut,
         uint24  _poolFee,
-        uint256 _slippageBps
+        uint256 _slippageBps,
+        address _aiOracle
     ) {
         require(_swapRouter != address(0), "Invalid router");
         require(_tokenIn   != address(0), "Invalid tokenIn");
         require(_tokenOut  != address(0), "Invalid tokenOut");
+        require(_aiOracle  != address(0), "Invalid oracle");
 
         owner       = msg.sender;
         relayer     = msg.sender;   // owner acts as relayer until updated
+        aiOracle    = _aiOracle;
         swapRouter  = _swapRouter;
         tokenIn     = _tokenIn;
         tokenOut    = _tokenOut;
@@ -152,17 +157,22 @@ contract TreasuryRebalancer {
      * @param   percentBps  Percentage of tokenIn balance to sell, in basis
      *                      points (e.g. 2500 = 25 %).  Capped at 10 000 (100 %).
      * @param   signal      Human-readable AI signal string ("CRITICAL", "CAUTION", etc.)
+     * @param   signature   ECDSA signature of the payload packed bytes from AI Oracle
      *
      * @dev     Called exclusively by the GenLayer relayer after on-chain AI
      *          consensus is reached.  Slippage protection is enforced on-chain
      *          via `amountOutMinimum` derived from the stored `slippageBps`.
+     *          Cryptographically verifies that the GenLayer Oracle signed the data.
      */
-    function rebalance(uint256 percentBps, string memory signal)
+    function rebalance(uint256 percentBps, string memory signal, bytes memory signature)
         external
         onlyAuthorized
         returns (bool)
     {
         require(percentBps > 0 && percentBps <= 10_000, "Invalid percentBps");
+        
+        // 1. Cryptographically verify GenLayer consensus signature
+        require(_verifySignature(percentBps, signal, signature), "Unauthorized AI consensus");
 
         uint256 balance = IERC20(tokenIn).balanceOf(address(this));
         require(balance > 0, "No tokenIn balance");
@@ -209,5 +219,26 @@ contract TreasuryRebalancer {
         bool ok = IERC20(token).transfer(owner, amount);
         require(ok, "Transfer failed");
         emit EmergencyWithdraw(token, amount);
+    }
+
+    // ── Cryptography ──────────────────────────────────────────────────────────
+
+    function _verifySignature(uint256 percentBps, string memory signal, bytes memory signature) internal view returns (bool) {
+        bytes32 payloadHash = keccak256(abi.encodePacked(percentBps, signal));
+        // Standard Ethereum signed message prefix
+        bytes32 ethSignedMessageHash = keccak256(
+            abi.encodePacked("\x19Ethereum Signed Message:\n32", payloadHash)
+        );
+        (uint8 v, bytes32 r, bytes32 s) = _splitSignature(signature);
+        return ecrecover(ethSignedMessageHash, v, r, s) == aiOracle;
+    }
+
+    function _splitSignature(bytes memory sig) internal pure returns (uint8 v, bytes32 r, bytes32 s) {
+        require(sig.length == 65, "Invalid signature length");
+        assembly {
+            r := mload(add(sig, 32))
+            s := mload(add(sig, 64))
+            v := byte(0, mload(add(sig, 96)))
+        }
     }
 }

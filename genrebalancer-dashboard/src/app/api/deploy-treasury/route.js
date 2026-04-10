@@ -77,7 +77,8 @@ export async function POST(request) {
       MOCK_WETH,
       MOCK_USDC,
       POOL_FEE,
-      SLIPPAGE
+      SLIPPAGE,
+      deployer.address
     );
 
     const deployTx = contract.deploymentTransaction();
