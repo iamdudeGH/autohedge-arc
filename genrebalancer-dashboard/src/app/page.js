@@ -312,7 +312,13 @@ export default function Home() {
 
         {/* Hero */}
         <div style={{ textAlign: 'center', padding: '2rem 0 4rem' }}>
-          <div style={{ fontSize: '5rem', marginBottom: '1.5rem', filter: 'drop-shadow(0 0 30px rgba(59,130,246,0.5))' }}>🤖</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            <img 
+              src="/logo.png" 
+              alt="GenRebalancer Shield" 
+              style={{ width: 160, height: 160, borderRadius: '32px', filter: 'drop-shadow(0 0 40px rgba(139, 92, 246, 0.4))', border: '1px solid rgba(255,255,255,0.1)' }} 
+            />
+          </div>
           <h2 style={{ fontSize: '3rem', fontWeight: 800, margin: '0 0 1rem', background: 'linear-gradient(135deg, #fff 30%, #93c5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Your Personal AI Treasury
           </h2>
