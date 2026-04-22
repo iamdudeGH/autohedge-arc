@@ -146,6 +146,22 @@ export async function POST(request) {
 
   log('INFO', `AI decision: ${marketSignal} | riskScore: ${riskScore} | percentBps: ${percentBps}`);
 
+  // ── 4a: Early Return on SAFE ─────────────────────────────────────────────────
+  // If the AI says SAFE, we do NOT execute a transaction on Arc.
+  // This explicitly fixes the "Decision Bridge Gap" so Arc only fires on TRADE_AUTHORIZED.
+  if (!isTradeAuthorized) {
+    log('INFO', 'AI concluded SAFE. No Arc transaction needed.');
+    return NextResponse.json({
+      success:     true,
+      action:      'HEARTBEAT_SAFE',
+      glTxHash,
+      riskScore,
+      marketSignal,
+      reasoning,
+      percentBps,
+    });
+  }
+
   // ── Step 5: Submit Arc tx to the user's demo treasury ─────────────────────
   log('INFO', `Submitting rebalance(${percentBps}, "${marketSignal}") to demo contract...`);
   let arcTxHash;
